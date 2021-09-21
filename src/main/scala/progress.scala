@@ -1,7 +1,7 @@
-//package progress
+package progress
 
 /**
- *  @constructor
+ *  @constructor Create a new Progress bar
  *  @param n Number of elements in the list
  *  @param width Size of the
  *
@@ -9,6 +9,10 @@
 class Progress(n: Int, width: Int = 80) {
   var pos = 0
 
+  /** Clear the bar's progress by
+   *  resetting `pos` to 0.
+   *
+   */
   def reset(): Unit = {
     pos = 0
   }
@@ -19,6 +23,7 @@ class Progress(n: Int, width: Int = 80) {
     val unfilled = " "
     val nPadChars = 9 // Brackets, a space, 5-chars, and a percent sign
 
+    // Calculate bar length
     val pctComplete = pos / n.toDouble
     val barWidth = width - nPadChars
     val nFilled = (barWidth * pctComplete).toInt
@@ -27,45 +32,58 @@ class Progress(n: Int, width: Int = 80) {
     f"[${ filled * nFilled }${ unfilled * nUnfilled }] ${ pctComplete * 100 }%5.1f%%"
   }
 
+  /** Increment the bar's position.
+   *
+   * Limits `pos` to the range: `0 <= pos <= n`
+   *
+   * @param by Amount to increment `pos`
+   */
   def inc(by: Int = 1) = {
-    pos += by
+    pos = (pos + by).min(n).max(0)
   }
 
+  /** Clear the bar from the terminal.
+   *
+   */
   def clear(): Unit = {
-//    print("\r")
-//    print("\r\033[K")
     print("\r\u001b[K")
   }
 
-  def write(clearFirst: Boolean = true, newLine: Boolean = false) = {
-    if (clearFirst) clear()
+  /** Write the bar to the terminal
+   *
+   * @param newLine Should a new line be added after?
+   */
+  def write(newLine: Boolean = false) = {
+    clear()
     print(formatBar())
     if (newLine) println()
+  }
+
+  /** Safely write a line to the terminal above the bar.
+   *
+   * Works by clearing the bar. Calling `println(x)`.
+   * And then re-writing the bar to the terminal.
+   *
+   * @param x Value to print to the terminal
+   */
+  def bprintln(x: Any): Unit = {
+    clear()
+    println(x)
+    write()
   }
 
 }
 
 object Progress {
-  def apply(n: Int, width: Int = 80) = {
+  /** Factory for [[progress.Progress]] instances.
+   *
+   * @param n Number of positions in the bar?
+   * @param width Display width of the bar.
+   * @return
+   */
+  def apply(n: Int = 100, width: Int = 80) = {
     new Progress(n, width)
   }
+
 }
 
-@main def run() = {
-
-  val x = 1.2345
-  println(f"1 + $x = ${1 + x}%.2f")
-
-  val b = Progress(200)
-  b.write()
-  
-  for (_ <- 1 to 200) {
-    b.inc(1)
-    b.write()
-    Thread.sleep((util.Random.nextDouble * 20).toInt)
-  }
-  
-  b.write(newLine=true)
-
-  println("Done.")
-}
