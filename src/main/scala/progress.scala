@@ -1,6 +1,7 @@
 package progress
 
-/**
+/** A terminal progress bar.
+ *
  *  @constructor Create a new Progress bar
  *  @param n Number of elements in the list
  *  @param width Size of the
@@ -17,6 +18,10 @@ class Progress(n: Int, width: Int = 80) {
     pos = 0
   }
 
+  /** Format the progress bar as a string.
+   *
+   * @return the terminal progress bar to be printed
+   */
   private def formatBar(): String = {
     // Constants
     val filled = "█"
